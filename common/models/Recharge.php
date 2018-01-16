@@ -4,6 +4,7 @@ namespace common\models;
 
 use Yii;
 use yii\helpers\Html;
+use common\models\Member;
 /**
  * This is the model class for table "{{%recharge}}".
  *
@@ -18,10 +19,12 @@ use yii\helpers\Html;
  */
 class Recharge extends \yii\db\ActiveRecord
 {
-    public static $states =[null=>'请选择','未审核','已审核','已打回'];
-    public static $pay_type=[1=>'微信',2=>'支付宝',3=>'现金',4=>'转账'];
+
+    public static $states = [null => '请选择', '未审核', '已审核', '已打回'];
+    public static $pay_type = [1 => '微信', 2 => '支付宝', 3 => '现金', 4 => '转账'];
     public $username;
     private static $toCashIndex = [4];
+
     /**
      * @inheritdoc
      */
@@ -38,15 +41,15 @@ class Recharge extends \yii\db\ActiveRecord
         return [
             [['member_id', 'type', 'create_time', 'confirm_time', 'state','pay_type'], 'integer'],
             [['type', 're_money', 'create_time', 'state'], 'required'],
-
+            [['username'], 'required', 'on' => 'backend_recharge'],
             [['re_money'], 'number'],
             [['info'], 'string', 'max' => 255],
-            ['username','string'],
-            ['username','checkMemberUser'],
-            [['re_money'],'checkFrontendMoney','on'=>'f_add'],
-            [['pay_time','pay_type'],'required','on'=>'f_add'],
-            ['pay_time','safe'],
-            ['type','in', 'range'=>static::$toCashIndex,'on'=>'f_add'],
+            ['username', 'string'],
+            ['username', 'checkMemberUser'],
+            [['re_money'], 'checkFrontendMoney', 'on' => 'f_add'],
+            [['pay_time','pay_type'],'required', 'on' => 'f_add'],
+            ['pay_time', 'safe'],
+            ['type', 'in', 'range' => static::$toCashIndex, 'on' => 'f_add'],
         ];
     }
 
@@ -80,16 +83,20 @@ class Recharge extends \yii\db\ActiveRecord
         }
 
     }
+
     // 前台验证充值金额
-    public function checkFrontendMoney(){
-        $money= $this->re_money;
-        if($money<=0){
-            return $this->addError('re_money','请输入正确的充值金额');
+    public function checkFrontendMoney()
+    {
+        $money = $this->re_money;
+        if ($money <= 0) {
+            return $this->addError('re_money', '请输入正确的充值金额');
         }
     }
+
     // 下拉数组
-    public static function getReList(){
-       $types= Account::$name_array;
+    public static function getReList()
+    {
+       $types = Account::$name_array;
        $reArr = [];
        foreach (static::$toCashIndex as $key => $value) {
            if (isset($types[$value])) {
@@ -97,10 +104,12 @@ class Recharge extends \yii\db\ActiveRecord
            }
        }
        return $reArr;
-    } 
+    }
+
     // 后台 充值确认 加金额
-    public function ChongZhi(){
-        if($this->update()){
+    public function chongZhi()
+    {
+        if ($this->update()) {
             // $type= Account::$field_array[$this->type];
             // $re=Account::updateAllCounters([$type=>$this->re_money],['member_id'=>$this->member_id]);
             // $re=Account::updateAllCounters([$type=>$this->re_money],['member_id'=>$this->member_id]);
@@ -109,16 +118,20 @@ class Recharge extends \yii\db\ActiveRecord
             // if(empty($re)){
                 // return false;
             // }
-        }else{
-            throw new \Exception("请重试");
-            
+        } else {
+            throw new \Exception("请重试");   
         }
         
     }
 
+    public function getMember()
+    {
+        return $this->hasMany(Member::className(), ['id' => 'member_id']);
+    }
+
     public function getAccount()
     {
-        return $this->hasMany(Account::className(), ['member_id'=>'member_id']);
+        return $this->hasMany(Account::className(), ['member_id' => 'member_id']);
     }
 
     public static function getStates()
@@ -129,8 +142,7 @@ class Recharge extends \yii\db\ActiveRecord
     public static function getState($type)
     {
         $states = self::getStates();
-        $class = ['info','success','danger'];
-       
-        return Html::tag('span',$states[$type],['class'=>'label label-'.$class[$type]]);
+        $class = ['info', 'success', 'danger'];
+        return Html::tag('span', $states[$type], ['class' => 'label label-' . $class[$type]]);
     }
 }

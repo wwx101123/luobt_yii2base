@@ -9,6 +9,8 @@ use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use common\helps\tools;
+
+use common\models\Member;
 /**
  * RechargeController implements the CRUD actions for Recharge model.
  */
@@ -35,64 +37,69 @@ class RechargeController extends LdBaseController
      */
     public function actionIndex()
     {
+        $luobt = '菜鸟鼻涕';
+        // $query = Recharge::find()->joinWith(['member'])->orderBy(['id' => SORT_DESC]);
+        
+        // echo '<pre>';
+        // var_dump($query->createCommand()->getRawSql());
+        // echo '</pre>';
+        // exit;
         $searchModel = new RechargeSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
-        $model =new Recharge;
-        if($model->load(yii::$app->request->post())){
+        $model = new Recharge;
+        $model->setScenario('backend_recharge');
+        if ($model->load(yii::$app->request->post())) {
             $model->state = 0;
             $model->create_time = time();
-            if($model->save()){
+            if ($model->save()) {
                return $this->redirect(['index']);
             }
         }
         return $this->render('index', [
-            'model' =>$model,
+            'model' => $model,
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
         ]);
     }
 
-// 充值审核  
-    public function actionAudit(){
-
-       $id=Yii::$app->request->post('id');
-       $models=Recharge::find()->where(['in','id',$id])->andWhere(['state'=>0])->all();
+    // 充值审核  
+    public function actionAudit()
+    {
+       $id = Yii::$app->request->post('id');
+       $models = Recharge::find()->where(['in', 'id', $id])->andWhere(['state' => 0])->all();
        $check = false;
        $connection = Yii::$app->db;
        $transaction = $connection->beginTransaction();
        try {
             foreach ($models as $k => $var) {
                 $var->state = 1;
-                $var->confirm_time=time();
-                $var->ChongZhi();
+                $var->confirm_time = time();
+                $var->chongZhi();
             }
-            $transaction->commit();/*提交事物*/
+            $transaction->commit(); /*提交事物*/
             return tools::jsonSuccess('审核成功');
-        }
-        catch (\Exception $e) {
-           $transaction->rollBack();/*回滚*/
+        } catch (\Exception $e) {
+            $transaction->rollBack(); /*回滚*/
             return tools::jsonError($e->getMessage());
         }
      }
 
-            //批量删除
-
-    public function actionRefuse(){
-        $id=yii::$app->request->post('id');
+    //批量删除
+    public function actionRefuse()
+    {
+        $id = Yii::$app->request->post('id');
         $connection = Yii::$app->db;
         $transaction = $connection->beginTransaction();
         try {
-            Recharge::deleteAll(['and',['in','id',$id],['state'=>0]]);
-            $transaction->commit();/*提交事物*/
-            return tools::jsonSuccess('删除成功');
-            
-        }
-        catch (\Exception $e) {
-            $transaction->rollBack();/*回滚*/
+            Recharge::deleteAll(['and', ['in', 'id', $id], ['state' => 0]]);
+            $transaction->commit(); /*提交事物*/
+            return tools::jsonSuccess('删除成功');  
+        } catch (\Exception $e) {
+            $transaction->rollBack(); /*回滚*/
             return tools::jsonError($e->getMessage());
-
         }
-    } 
+    }
+
     /**
      * Creates a new Recharge model.
      * If creation is successful, the browser will be redirected to the 'view' page.

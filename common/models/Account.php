@@ -41,6 +41,10 @@ class Account extends \yii\db\ActiveRecord
         '8' => ''
     ];
 
+    /**
+     * 后台充值类型
+     * @return [type] [description]
+     */
     public static function backendRechargeAccountArr()
     {
         $arr = self::$name_array;
@@ -130,10 +134,10 @@ class Account extends \yii\db\ActiveRecord
 
     public static function addAccount($member_id, $amount, $accountName, $bz='')
     {
-        $file = is_numeric($accountName) ? 'account'.$accountName : $accountName;
+        $file = is_numeric($accountName) ? 'account'. $accountName : $accountName;
         $name = self::accountNameByFile($file);
         if (!self::changeAccount($member_id, $file, $amount)) {
-            throw new \Exception($name."余额不足", 1);
+            throw new \Exception($name . "余额不足", 1);
         }         
         $model = new AccountHistory;
         $model->member_id = $member_id;
@@ -152,12 +156,12 @@ class Account extends \yii\db\ActiveRecord
         }
     }
 
-    public static function changeAccount($member_id,$file,$amount)
+    public static function changeAccount($member_id, $file, $amount)
     {
         if ($amount == 0) {
             return true;
         }
-        return self::updateAllCounters([$file=>$amount], ['and',['member_id'=>$member_id], ['>=',$file, -$amount]]);
+        return self::updateAllCounters([$file => $amount], ['and', ['member_id' => $member_id], ['>=', $file, -$amount]]);
     }
 
 }

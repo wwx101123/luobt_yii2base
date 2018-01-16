@@ -23,7 +23,7 @@ use yii\helpers\Html;
  */
 class ToCash extends \yii\db\ActiveRecord
 {
-    public static $states =[null=>'请选择','未审核','已审核','已打回'];
+    public static $states = [null => '请选择', '未审核', '已审核', '已打回'];
     public $bankcard_id;
     /**
      * @inheritdoc

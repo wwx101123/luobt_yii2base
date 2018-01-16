@@ -298,6 +298,11 @@ class Member extends ActiveRecord implements IdentityInterface
         throw new \Exception("Error Processing Request", 1);
     }
 
+    public static function searchMember($member_id)
+    {
+        return self::find()->where(['id' => $member_id])->select('username')->column();
+    }
+
     //返回姓名
     public static function getFatherName($id)
     {
@@ -325,4 +330,5 @@ class Member extends ActiveRecord implements IdentityInterface
        $ratio = sprintf("%.3f", $pay/$income);
        return ($ratio * 100). ' %';
     }
+
 }

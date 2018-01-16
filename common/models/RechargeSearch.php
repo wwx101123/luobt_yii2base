@@ -12,15 +12,16 @@ use common\models\Recharge;
  */
 class RechargeSearch extends Recharge
 {
+    public $username;
     /**
      * @inheritdoc
      */
     public function rules()
     {
         return [
-            [['id', 'member_id', 'type', 'create_time', 'confirm_time', 'state','pay_type','pay_time'], 'integer'],
+            [['id', 'type', 'state', 'pay_type', 'pay_time', ], 'integer'],
             [['re_money'], 'number'],
-            [['info'], 'safe'],
+            [['info', 'username'], 'safe'],
         ];
     }
 
@@ -41,12 +42,16 @@ class RechargeSearch extends Recharge
      * @return ActiveDataProvider
      */
     public function search($params)
-    {
-        $query = Recharge::find()->orderBy(['id'=>SORT_DESC]);
+    {   
+        
+        $query = Recharge::find()->joinWith(['member'])->orderBy(['id' => SORT_DESC]);
 
-        //$query = Recharge::find()->joinWith(['account'])->orderBy(['id' => SORT_DESC]);
-
-        // add conditions that should always apply here
+        // $query = Recharge::find()->joinWith(['member'])->where('member_id = 1')->select('ld_recharge.*, ld_member.username')->orderBy(['id' => SORT_DESC])->one();
+        // echo '<pre>';
+        // var_dump($query);
+        // // var_dump($query->createCommand()->getRawSql());
+        // echo '</pre>';
+        // exit;
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
@@ -62,6 +67,7 @@ class RechargeSearch extends Recharge
 
         // grid filtering conditions
         $query->andFilterWhere([
+            'username' => $this->username,
             'id' => $this->id,
             'member_id' => $this->member_id,
             'type' => $this->type,
@@ -75,6 +81,7 @@ class RechargeSearch extends Recharge
         ]);
 
         $query->andFilterWhere(['like', 'info', $this->info]);
+        // $query->andFilterWhere('like', array($this->username), $this->username);
 
         return $dataProvider;
     }
