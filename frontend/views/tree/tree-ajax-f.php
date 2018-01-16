@@ -1,0 +1,140 @@
+<?php 
+use yii\bootstrap\ActiveForm;
+use yii\helpers\Url;
+use yii\helpers\Html;
+use common\JsBlock\JsBlock;
+use common\models\Params;
+use common\models\Member;
+use common\models\Tree;
+
+$this->title = '网络关系图';
+$this->params['breadcrumbs'][] = $this->title;
+?>
+<style>
+.treep1{display:;}
+.treep2{display:none;}
+p{margin:0px}
+</style>
+
+  <?php $form = ActiveForm::begin(); ?>
+    <div class="row">
+        <div class="col-lg-3 pull-left">
+          <div class="input-group">
+            <input type="text" class="form-control" name="username" placeholder="会员编号" >
+            <span class="input-group-btn">
+              <button class="btn btn-primary" type="submit">查询</button>
+            </span>
+          </div><!-- /input-group -->
+        </div><!-- /.col-lg-6 -->
+        <div class="col-lg-3">
+          团队人数 : <b><?php echo $teamAmount ?></b>
+        </div><!-- /.col-lg-6 -->
+      </div><!-- /.row -->
+  <?php ActiveForm::end(); ?>
+  <br>
+<table width="100%" border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><img name="img1" src="<?php echo Tree::getAjaxTreeImg($topMember);?>" align="absmiddle">
+          <?php echo $topMember->username; ?>
+          [<?php echo Params::getLevelNameByLevel($topMember->u_level); ?>]
+          [<?php echo Params::getDLevelNameByLevel($topMember->d_level); ?>]
+          [<?php echo $topMember->yeji ?>]
+          
+    </td>
+  </tr>
+</table>
+<table width="100%" border="0" cellspacing="0" cellpadding="0" id="mm">
+  <tbody><tr>
+    <td>
+    <?php foreach ($users as $key => $user): ?>
+      <?php 
+        $imgUrl = Url::to('@web/statics/images/tree');
+        $imgNamePrefix = Member::find()->where(['father_id'=>$user->id])->one() ? 'P' : 'L'; 
+        $imgNameNum = $key == count($users) - 1 ? 2 : 1;
+        $imgFullUrl = $imgUrl . '/' . $imgNamePrefix . $imgNameNum . '.gif';
+        $ppath = $key == count($users) - 1 ? "" : "1";
+        $openImage = $imgUrl . '/M' . $imgNameNum . '.gif';
+       ?>
+        <div>
+            <img id="img<?php echo $user->id;?>" src="<?php echo $imgFullUrl ?>" align="absmiddle" 
+            onclick="openmm('m<?php echo $user->id;?>','img<?php echo $user->id;?>','<?php echo $user->id;?>','1','<?php echo $ppath ?>')">
+            <img id="fg<?php echo $user->id;?>" src="<?php echo Tree::getAjaxTreeImg($user);?>" align="absmiddle"> 
+            <?php echo $user->username; ?>
+
+          [<?php echo Params::getLevelNameByLevel($user->u_level); ?>]
+          [<?php echo Params::getDLevelNameByLevel($user->d_level); ?>]
+          [<?php echo $user->yeji ?>]
+
+            <img id="oimg<?php echo $user->id;?>" src="<?php echo $openImage ?>" align="absmiddle" style="display:none;">
+        </div>
+        <table width="100%" border="0" cellspacing="0" cellpadding="0" id="m<?php echo $user->id;?>" class="treep2">
+          <tbody><tr>
+            <td id="m<?php echo $user->id;?>_tree"><img src="<?php echo Url::to('@web/statics/images/tree/L4.gif') ?>" align="absmiddle"><img src="<?php echo Url::to('@web/statics/images/tree/loading2.gif') ?>" align="absmiddle"></td>
+          </tr>
+          </tbody>
+        </table>
+    <?php endforeach ?>
+
+    </td>
+  </tr>
+</tbody>
+</table>
+<div class="row ">
+          <?php foreach (Tree::$ajaxStrArr as $key => $value): ?>
+                <div class="panel panel-tile text-center br-a br-light col-sm-1">
+                  <div class="panel-body bg-light">
+                    <img src="<?php echo $key ?>">
+                    <h6 class="text-system"><?php echo $value ?></h6>
+                  </div>
+                </div>
+          <?php endforeach ?>
+</div>
+
+<?php JsBlock::begin(); ?>
+<script>
+function openmm(oid,tid,mid,numm,ppath){
+  var tobj = document.getElementById(oid);
+  var mobj = document.getElementById(tid);
+  var cmid = "o"+tid;
+  var cobj = document.getElementById(cmid);
+  var coimg = cobj.src;
+  if(tobj.className=="treep2"){
+    tobj.className="treep1";
+    var opppid = oid+"_tree";
+    ajaxChech(opppid,mid,numm,ppath)
+  }else{
+    tobj.className="treep2";
+  }
+  cobj.src = mobj.src;
+  mobj.src = coimg;
+  
+
+}
+function ajaxChech(vid,aid,nnn,pp){
+  var xmlHttp;
+  try{
+    //FF Opear 8.0+ Safair
+    xmlHttp=new XMLHttpRequest();
+  }
+  catch(e){
+    try{
+      xmlHttp=new ActiveXObject("Microsoft.XMLHTTP");
+    }
+    catch(e){
+      alert("{:L('您的浏览器不支持')}AJAX");
+      return false;    
+    }
+  }
+  xmlHttp.onreadystatechange=function(){
+    if(xmlHttp.readyState==4){
+      var valuet = xmlHttp.responseText;
+      document.getElementById(vid).innerHTML=valuet;
+    }
+  }
+  var url="<?php echo Url::to(['tree/get-ajax-son-f']); ?>";
+  url+="?reid="+aid+"&nn="+nnn+"&pp="+pp;
+  xmlHttp.open("GET",url,true);
+  xmlHttp.send(null);
+}
+</script>
+<?php JsBlock::end(); ?>

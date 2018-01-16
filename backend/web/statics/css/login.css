@@ -1,0 +1,19 @@
+.login-page-img{
+	
+}
+.login-page{
+	background:url(../images/bg.jpg) no-repeat top center !important; 
+}
+.login-logo b{     font-size: 24px;    border-bottom: 1px #B7B7B7 solid;  padding-bottom: 13px; display:block;}
+.has-feedback .form-control {
+    padding-left: 33.5px;
+}
+.form-control-feedback{left:0px;}
+.login-box-body, .register-box-body {
+    background: #2b2b2b !important;
+    padding: 20px;
+    border-top: 0;
+    color: #f3f3f3 !important;
+    position: relative;
+    z-index: 300;
+}

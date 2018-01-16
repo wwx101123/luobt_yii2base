@@ -1,0 +1,7 @@
+.card .well-lg{       background-image:-webkit-linear-gradient(-75deg,#7cb5ff,#3397ff);    padding: 17px; cursor:pointer;}
+.card .well-lg i{width: 16px;height: 16px;background:url(../images/card.png) no-repeat;display:inline-block;background-size:cover;margin-top: 5px;}
+.card .well-lg h2{margin-top: 0px;display: inline-block;font-size: 11px;font-weight: 700;line-height: 23px;color: #fff;vertical-align:top;}
+.card .well-lg .label { display:inline-block;    float: right;    font-weight: 100;background-color: #2585d2;}
+.card .well-lg .lead{display:block;font-size: 15px;color:#fff;margin-bottom: 0px;}
+.card .checked{      background:#fff url(../images/selected-icon.png) no-repeat top right;    border: 1px #2785d0 solid; }
+.card .checked h2,.card .checked .lead{ color:#333;}

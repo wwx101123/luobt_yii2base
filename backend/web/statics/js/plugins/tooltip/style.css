@@ -1,0 +1,8 @@
+body {font:13px/1.5 calibri, sans-serif; background:#FFF;}
+#text {margin:50px auto; width:500px}
+.hotspot {color:#F00; padding-bottom:1px; border-bottom:1px dotted #900; cursor:pointer}
+
+#tt {position:absolute; display:block; background: url(images/hover_bg_tooltip.png) top left no-repeat;}
+#tttop {display:block; height:5px; margin-left:5px; background:none top right no-repeat; overflow:hidden}
+#ttcont {display:block; padding:0px 0px 0px 0px; margin-left:5px; background:none; color:#F00;border:2px;border-style:solid;border-color:#490707;}
+#ttbot {display:block; height:5px; margin-left:5px; background:none top right no-repeat; overflow:hidden}
